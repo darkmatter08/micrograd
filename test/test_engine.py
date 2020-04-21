@@ -1,5 +1,59 @@
 import torch
-from micrograd.engine import Value
+from micrograd.engine import Value, Tensor
+
+def test_Tensor_sanity_check_scalar():
+
+    x = Tensor([[Value(-4.0)]])
+    two_1 = Tensor([[Value(2)]])
+    two_2 = Tensor([[Value(2)]])
+    z = two_1 * x + two_2 + x
+    q = z.relu() + z * x
+    h = (z * z).relu()
+    y = h + q + q * x
+    y.data[0][0].backward()
+    xmg, ymg = x.data[0][0], y.data[0][0]
+
+    x = torch.Tensor([-4.0]).double()
+    x.requires_grad = True
+    z = 2 * x + 2 + x
+    q = z.relu() + z * x
+    h = (z * z).relu()
+    y = h + q + q * x
+    y.backward()
+    xpt, ypt = x, y
+
+    # forward pass went well
+    assert ymg.data == ypt.data.item()
+    # backward pass went well
+    assert xmg.grad == xpt.grad.item()
+
+def test_Tensor_sanity_check_vector():
+    # TODO finish this...
+
+    x = Tensor([[Value(-4.0), Value(-4.0)]])
+    two_1 = Tensor([[Value(2), Value(2)]])
+    two_2 = Tensor([[Value(2), Value(2)]])
+    z = two_1 * x + two_2 + x
+    q = z.relu() + z * x
+    h = (z * z).relu()
+    y = h + q + q * x
+    print(y.shape)
+    y.data[0][0].backward()
+    xmg, ymg = x.data[0][0], y.data[0][0]
+
+    x = torch.Tensor([-4.0]).double()
+    x.requires_grad = True
+    z = 2 * x + 2 + x
+    q = z.relu() + z * x
+    h = (z * z).relu()
+    y = h + q + q * x
+    y.backward()
+    xpt, ypt = x, y
+
+    # forward pass went well
+    assert ymg.data == ypt.data.item()
+    # backward pass went well
+    assert xmg.grad == xpt.grad.item()
 
 def test_sanity_check():
 
