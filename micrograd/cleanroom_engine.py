@@ -58,6 +58,7 @@ class Value:
         # Call _backward on the right-most node
         # no outbound edges in compute graph
         # also is not the children of any node.
+        # Note: top-sort is different than BFS and DFS.
 
         # assume it's a dag
         # assume this is called on the loss (the right-most node in a topsort).
@@ -71,23 +72,9 @@ class Value:
                 topo.append(v)
         build_topo(self)
 
-        # print(f"{topo=}")
         self.grad = 1.0
         for node in reversed(topo):
             node._backward()
-
-
-        # self.grad = 1.0
-        # q = [self, ]
-        # while len(q):
-        #     node = q.pop()
-        #     print(f"backward on {node=}")
-        #     for prev in node._prev:
-        #         print(f"adding {prev=} to q")
-        #         q.append(prev)
-        #     node._backward()
-        #     for prev in node._prev:
-        #         print(f"{prev=}")
 
     def __neg__(self): # -self
         return -1 * self
